@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Core.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using Microsoft.Extensions.Logging;
 
 
