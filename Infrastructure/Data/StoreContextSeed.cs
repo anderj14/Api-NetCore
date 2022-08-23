@@ -3,7 +3,7 @@ using Core.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-
+using Core.Entities.OrderAggregate;
 
 namespace Infrastructure.Data
 {
@@ -57,6 +57,8 @@ namespace Infrastructure.Data
                 
                 if (!context.Products.Any())
                 {
+                    await context.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT DeliveryMethods ON");
+
                     var productsData = File.ReadAllText("../Infrastructure/Data/SeedData/products.json");
                     var products = JsonSerializer.Deserialize<List<Product>>(productsData);
 
@@ -66,7 +68,27 @@ namespace Infrastructure.Data
                     }
 
                     await context.SaveChangesAsync();
+                    await context.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT DeliveryMethods OFF");
                 }
+
+                if (!context.DeliveryMethods.Any())
+                {
+
+                    await context.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT DeliveryMethods ON");
+
+                    var dmData = File.ReadAllText("../Infrastructure/Data/SeedData/delivery.json");
+                    var methods = JsonSerializer.Deserialize<List<DeliveryMethod>>(dmData);
+
+                    foreach (var item in methods)
+                    {
+                        context.DeliveryMethods.Add(item);
+                    }
+
+                    await context.SaveChangesAsync();
+                    await context.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT DeliveryMethods OFF");
+
+                }
+                
             }
             catch (Exception e)
             {
